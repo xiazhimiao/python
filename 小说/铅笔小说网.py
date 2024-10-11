@@ -70,6 +70,7 @@ def if_has_next(url_next):
 
 def save_page_content(html_content, chapter):
     # soup = BeautifulSoup(html_content, 'html.parser')
+    # soup = BeautifulSoup(html_content, 'lxml')  lxml可能会更快，好像更慢了
     # chapter = soup.find('div', id='mlfy_main_text').find('h1').text
     h = html2text.HTML2Text()
     markdown_content = ((h.handle(html_content)
@@ -210,6 +211,8 @@ if __name__ == '__main__':
     if manual_failed_tasks_list:
         print('打印失败章节')
         print(manual_failed_tasks_list)
+    else:
+        print('全部成功！！！')
 
 
 
