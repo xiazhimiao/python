@@ -32,5 +32,5 @@
 ![菜鸟python3保存主要内容为md.png](img/菜鸟python3爬取主要存储md.png)
 
 
-8.菜鸟python3保存主要内容为md
+8.新华网焦点新闻爬取
 ![新华网焦点新闻爬取.png](img/新华网焦点新闻爬取.png)
