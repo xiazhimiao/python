@@ -27,3 +27,10 @@
 6.小说网采集.png
 
 ![小说网采集.png](img/小说网采集.png)
+
+7.菜鸟python3保存主要内容为md
+![菜鸟python3保存主要内容为md.png](img/菜鸟python3爬取主要存储md.png)
+
+
+8.菜鸟python3保存主要内容为md
+![新华网焦点新闻爬取.png](img/新华网焦点新闻爬取.png)
