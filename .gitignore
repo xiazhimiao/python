@@ -1,3 +1,5 @@
 .idea
 _pycache_
 菜鸟/python3
+/Scrapy/people_news_crawler/people_news_crawler/output.json
+/Scrapy/people_news_crawler/people_news_crawler/scrapy.log
