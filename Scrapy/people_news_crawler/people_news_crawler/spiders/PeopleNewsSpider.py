@@ -27,18 +27,24 @@ class PeopleNewsSpider(scrapy.Spider):
         item = response.meta['item']
         div = response.css('.col.col-1.fl')
 
-
         # source and time
         time_div = div.css('.col-1-1.fl')
         a = time_div.css('a')
         time_text = time_div.css('::text').get()
         a_text = a.css('::text').get()
-        item['source'] = a_text
+        if a_text:
+            item['source'] = a_text
+        else:
+            item['source'] = '解析失败'
 
         if time_text:
             time_parts = time_text.split('|')
             if time_parts:
                 item['time'] = time_parts[0].strip()
+            else:
+                item['time'] = '解析失败'
+        else:
+            item['time'] = '解析失败'
 
         # 内容
         rm_txt_con_div = div.css('.rm_txt_con.cf')
@@ -48,12 +54,15 @@ class PeopleNewsSpider(scrapy.Spider):
             p_text = p.css('::text').get()
             if p_text:
                 content += p_text
-        item['content'] = content
-
+        if content == '':
+            item['content'] = '解析失败'
+        else:
+            item['content'] = content
         # 责编
         edit_div = rm_txt_con_div.css('.edit.cf')
         edit_text = edit_div.css('::text').get()
         if edit_text:
             item['author'] = edit_text
-
+        else:
+            item['author'] = '解析失败'
         yield item
