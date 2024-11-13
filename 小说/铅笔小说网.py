@@ -1,5 +1,7 @@
 import codecs
 import concurrent
+import os
+import sys
 import threading
 import time
 import unittest
@@ -15,7 +17,7 @@ import concurrent.futures
 def get_html_text(url):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0',
-        'cookie': 'jq_Obj=1; ff54ff0fa0f557568e6e69d35b815894=fcad32351f41e0bacbc3c4dc74b2a721; zh_choose=n; _ga=GA1.1.234751423.1728474308; _ga_YN9485YEKE=GS1.1.1728535222.6.1.1728536491.0.0.0'
+        'cookie': 'zh_choose=n; jq_Obj=1; ff54ff0fa0f557568e6e69d35b815894=73f2a200eb3045f34a6a63b30673ccc8; _ga=GA1.1.1325912085.1731486613; zh_choose=n; _ga_YN9485YEKE=GS1.1.1731486612.1.1.1731488916.0.0.0'
         ,
 
     }
@@ -29,6 +31,8 @@ def get_html_text(url):
 
 def fetch_and_save_urls(url):
     html = get_html_text(url)
+    if html == "":
+        sys.exit("因html为空，导致系统提前终止")
     soup = BeautifulSoup(html, 'html.parser')
     ul_tag = soup.find('ul', class_='chaw_c')
     a_all = ul_tag.find_all('a')
@@ -78,7 +82,7 @@ def save_page_content(html_content, chapter):
                          .replace(' ', ''))
                         .replace('铅笔小说网qianbiwenxue.com', ''))
     # print(markdown_content)
-    with open('无敌剑域/' + chapter + '.md', 'w', encoding='utf-8') as file:
+    with open('她的秘密/' + chapter + '.md', 'w', encoding='utf-8') as file:
         file.write(markdown_content)
 
 
@@ -122,6 +126,8 @@ def read_css_dict(css_url):
             return css_dict
     except FileNotFoundError:
         css_content = get_html_text(css_url)
+        if css_content == '':
+            sys.exit("因css错误导致提前退出")
         icon_pattern = r'\.icon-(.*?):before\s*\{\s*content:\s*"(.*?)";\s*\}'
         css_dict = re.findall(icon_pattern, css_content)
         with open('css_dict.yml', 'w') as file:
@@ -160,13 +166,17 @@ def process_html_pages(chapter, url):
 
 
 if __name__ == '__main__':
+    if not os.path.exists('她的秘密'):
+        os.mkdir('她的秘密')
     # 不带cookie的话，只会返回部分子链接
     # 获取URLS列表
-    url = 'https://www.qianbiwenxue.com/noval/41497273.html'
+    url = 'https://www.qianbiwenxue.com/noval/41479393.html'
+    # url = 'https://www.invalid_url.com'
 
     # 经分析，替换字符采用UTF-16BE（Big Endian，大端序）
     # https://www.qianbiwenxue.com/static/css/fonts.css?v=c560a99cd812e57bb8e2e8fdde5f1650（唯一）
     css_url = 'https://www.qianbiwenxue.com/static/css/fonts.css?v=c560a99cd812e57bb8e2e8fdde5f1650'
+    # css_url = 'https://www.invalid_css_url.com'
 
     # 加载url列表
     url_s = read_urls(url)
