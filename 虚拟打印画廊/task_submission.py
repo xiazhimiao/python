@@ -43,7 +43,6 @@ def submit_artwork():
             "title": title,
             "author": author,
             "description": description,
-            "status": "等待",
             "timestamp": timestamp
         }
 
@@ -62,6 +61,11 @@ def submit_artwork():
 # 创建主窗口
 root = tk.Tk()
 root.title("虚拟打印画廊提交界面")
+# 设置主窗口大小为200x200像素
+root.geometry("200x200")
+
+# 在Windows下设置窗口属性，去除全屏和缩小按钮
+root.attributes('-toolwindow', True)
 
 # 作品标题标签和输入框
 title_label = tk.Label(root, text="作品标题：")
@@ -93,4 +97,5 @@ status_label.pack()
 if not os.path.exists(input_spool_dir):
     os.makedirs(input_spool_dir)
 
-# root.mainloop()
+if __name__ == "__main__":
+    root.mainloop()
