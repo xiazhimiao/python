@@ -1,9 +1,13 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-driver = webdriver.Chrome()
+# driver = webdriver.Chrome()
+
+service = Service(executable_path="./chromedriver.exe")  # 替换为实际路径
+driver = webdriver.Chrome(service=service)
 driver.maximize_window()
 
 try:
@@ -82,28 +86,30 @@ try:
                     major = row.find_element(By.XPATH, ".//td[3]").text.strip()
                     direction = row.find_element(By.XPATH, ".//td[5]").text.strip()
 
-                    # 处理科目显示（点击查看或默认展开）
+                    # 默认展开
                     try:
-                        # 点击查看（部分院校需要）
-                        view_btn = WebDriverWait(row, 3).until(
-                            EC.element_to_be_clickable((By.XPATH, ".//a[contains(., '查看') and @href='javascript:;']"))
+                        kskm = WebDriverWait(row, 5).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, '.kskm-modal.kskm-detail-list'))
                         )
-                        driver.execute_script("arguments[0].click();", view_btn)
-                        kskm = WebDriverWait(row, 3).until(
-                            EC.visibility_of_element_located((By.XPATH, './/div[@class="kskm-detail"]'))
-                        )
-                    except:
-                        # 默认展开
-                        kskm = WebDriverWait(row, 3).until(
-                            EC.presence_of_element_located((By.XPATH, './/div[@class="kskm-detail"]'))
-                        )
+                        print("成功定位到元素")
+                    except Exception as e:
+                        print(f"定位元素失败: {e}")
 
                     # 提取科目代码（忽略说明）
-                    subjects = [
-                        div.text.split('<span')[0].strip()  # 只取代码部分
-                        for div in kskm.find_elements(By.XPATH, './div')
-                        if any(keyword in div.text for keyword in ['政治', '外语', '业务课'])
-                    ]
+                    try:
+                        subjects = []
+                        kskm_details = kskm.find_elements(By.CSS_SELECTOR, '.kskm-detail .item')
+                        print("成功定位到元素kskm_details")
+                        for item in kskm_details:
+                            text = item.get_attribute('innerHTML')
+
+                            # 去除 <span> 标签内的内容
+                            if '<span' in text:
+                                text = text.split('<span')[0].strip()
+                            subjects.append(text)
+                    except Exception as e:
+                        print(f"定位元素失败kskm_details: {e}")
+
                     # 补全四科（处理缺失）
                     exam_subjects = subjects[:4] + ['未公布'] * (4 - len(subjects))
 
@@ -117,7 +123,8 @@ try:
                     print("─" * 60)
 
                 except Exception as e:
-                    print(f"⚠️ 行提取失败：{str(e)[:50]}")
+                    print(
+                        f"⚠️ 行提取失败（院校: {school_name}, 院系: {department if 'department' in locals() else '未知'}）: {str(e)}")
                     continue
 
         except Exception as e:
@@ -128,5 +135,5 @@ except Exception as e:
     print(f"\n❌ 致命错误：{str(e)}")
     driver.save_screenshot("error.png")
 finally:
-    driver.quit()
     input("按回车结束程序...")
+    driver.quit()
