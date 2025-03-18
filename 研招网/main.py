@@ -99,7 +99,7 @@ def expand_schools(driver):
                 driver.execute_script("arguments[0].click();", expand_btn)
                 print(
                     f"✅ 展开 {idx}/{len(schools)}: {school.find_element(By.XPATH, './/div[@class=\"yx-name\"]').text}")
-                time.sleep(1)  # 点击展开后延迟 1 秒
+                time.sleep(0.5)  # 点击展开后延迟 1 秒
             else:
                 print(f"ℹ️ 跳过 {idx}（已展开）: {school.find_element(By.XPATH, './/div[@class=\"yx-name\"]').text}")
         except Exception as e:
@@ -131,19 +131,30 @@ def extract_subjects(schools, driver):
                             major = row.find_element(By.XPATH, ".//td[3]").text.strip()
                             direction = row.find_element(By.XPATH, ".//td[5]").text.strip()
 
-                            kskm_list = WebDriverWait(row, 5).until(
+                            kskm = WebDriverWait(row, 5).until(
                                 EC.presence_of_element_located((By.CSS_SELECTOR, '.kskm-modal.kskm-detail-list'))
                             )
 
                             # 提取科目
                             # kskm_list = kskm.find_element(By.CSS_SELECTOR, '.kskm-detail-list')
 
-                            subjects = []
-                            for item in kskm_list.find_elements(By.CSS_SELECTOR, '.kskm-detail .item'):
-                                text = item.get_attribute('innerHTML')
-                                if '<span' in text:
-                                    text = text.split('<span')[0].strip()
-                                subjects.append(text)
+                            subjects = [''] * 4
+                            i = 0
+
+                            kskm_details = kskm.find_elements(By.CSS_SELECTOR, '.kskm-detail')
+                            # 假设最多有 4 个科目，先初始化列表
+
+                            for detail in kskm_details:
+                                items = detail.find_elements(By.CSS_SELECTOR, '.item')
+                                for item in items:
+                                    text = item.get_attribute('innerHTML')
+                                    if '<span' in text:
+                                        text = text.split('<span')[0].strip()
+                                    if i < len(subjects):
+                                        subjects[i] += text + '|'
+                                    i += 1
+                                i = 0
+
                             exam_subjects = subjects[:4] + ['未公布'] * (4 - len(subjects))
                             row_data = [school_name, department, major, direction] + exam_subjects
                             data.append(row_data)
@@ -154,7 +165,7 @@ def extract_subjects(schools, driver):
 
                     # 分页处理
                     next_page_xpath = ".//div[@class='margin-top-12 clearfix']/ul[@class='ivu-page mini']/li[@title='下一页' and contains(@class, 'ivu-page-next')]"
-                    if not click_next_page(driver,school, next_page_xpath, 1, True):
+                    if not click_next_page(driver, school, next_page_xpath, 1, True):
                         print("已经是最后一页，退出循环")
                         break
 
@@ -243,7 +254,7 @@ def main():
 
             # 定位全局分页按钮
             next_page_xpath = "//div[@class='margin-top-20 clearfix']/ul[@class='ivu-page']/li[@title='下一页' and contains(@class, 'ivu-page-next')]"
-            if not click_next_page(driver,driver, next_page_xpath, 5, True):
+            if not click_next_page(driver, driver, next_page_xpath, 3, True):
                 print("全局下一页按钮不可用，终止")
                 break
 
