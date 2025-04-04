@@ -4,7 +4,7 @@ from pyecharts.faker import Faker
 import pandas as pd
 import yaml
 
-df = pd.read_csv('../京东/new_file.csv', usecols=['price', 'comments'])
+df = pd.read_csv('../../京东/new_file_cp.csv', usecols=['price', 'comments'])
 
 # 假设数据已经读取到 df 中
 # 先去除字符串中的货币符号，再将其转换为浮点数

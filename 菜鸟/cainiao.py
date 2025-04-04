@@ -12,6 +12,29 @@ response.encoding = 'utf-8'
 with open('cainiao1.html', 'wb') as f:
     f.write(response.content)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 with open('cainiao2.html', 'w', encoding='utf-8') as f:
     f.write(response.text)
     # response.text 根据指定或者默认的编码进行翻译的文本数据
